@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from "react-native";
+import { Text } from "react-native";
 import {
   useFonts,
   Poppins_400Regular,
@@ -6,6 +6,11 @@ import {
 } from "@expo-google-fonts/poppins";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import AppNavigator from "./navigation/AppNavigator";
+import { LogBox } from "react-native";
+
+LogBox.ignoreLogs([
+  "Support for defaultProps will be removed from function components",
+]);
 
 export default function App() {
   const [fontsLoaded] = useFonts({
@@ -23,12 +28,3 @@ export default function App() {
     </SafeAreaProvider>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-});
