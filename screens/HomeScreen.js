@@ -55,7 +55,6 @@ const styles = StyleSheet.create({
   wrapper: {
     flex: 1,
     marginTop: 20,
-    // padding: 20,
     backgroundColor: Colors.dark.background,
   },
 

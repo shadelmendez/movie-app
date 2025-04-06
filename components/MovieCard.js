@@ -1,12 +1,20 @@
 import React from "react";
-import { Button, ImageBackground, View, Text, StyleSheet } from "react-native";
+import {
+  ImageBackground,
+  View,
+  Text,
+  StyleSheet,
+  Pressable,
+} from "react-native";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import useDeviceType from "../hooks/useDeciveType";
 import Colors from "../constants/colors";
 import Entypo from "@expo/vector-icons/Entypo";
+import { useNavigation } from "@react-navigation/native";
 
 export default function MovieCard({ imageUrl }) {
-  const { width, height } = useDeviceType();
+  const { width, height, isTablet } = useDeviceType();
+  const navigation = useNavigation();
   return (
     <View
       style={[styles.wrapper, { width: width * 0.3, height: height * 0.35 }]}
@@ -14,7 +22,7 @@ export default function MovieCard({ imageUrl }) {
       <ImageBackground
         source={imageUrl}
         style={styles.image}
-        resizeMode="cover"
+        resizeMode="stretch"
       >
         <View style={styles.ratings}>
           <AntDesign name="star" size={20} color={Colors.dark.accent} />
@@ -47,12 +55,49 @@ export default function MovieCard({ imageUrl }) {
           </Text>
         </View>
       </View>
-      <View style={styles.buttons}>
-        {/*TODO: Cambiar a Pressable btns */}
-        <Button title="Ver Más" color={Colors.dark.highlight}></Button>
-        <Button title="Calificar" color="#fff">
-          <AntDesign name="staro" size={24} color="black" />
-        </Button>
+      <View style={styles.buttonsDetails}>
+        <Pressable
+          style={[
+            styles.button,
+            {
+              width: isTablet ? width * 0.12 : width * 0.05,
+              height: isTablet ? height * 0.03 : height * 0.05,
+              backgroundColor: Colors.dark.highlight,
+            },
+          ]}
+          onPress={() => navigation.navigate("Details")}
+        >
+          <Text
+            style={{
+              fontSize: isTablet ? 10 : 8,
+              fontFamily: "Poppins_700Bold",
+              color: "#fff",
+            }}
+          >
+            Ver Más
+          </Text>
+        </Pressable>
+        <Pressable
+          style={[
+            styles.button,
+            {
+              width: isTablet ? width * 0.12 : width * 0.05,
+              height: isTablet ? height * 0.03 : height * 0.05,
+              backgroundColor: "#F8F8FF",
+            },
+          ]}
+          onPress={() => navigation.navigate("Details")}
+        >
+          <AntDesign name="staro" size={18} color={Colors.dark.highlight} />
+          <Text
+            style={{
+              fontSize: isTablet ? 10 : 8,
+              fontFamily: "Poppins_700Bold",
+            }}
+          >
+            Calificar
+          </Text>
+        </Pressable>
       </View>
     </View>
   );
@@ -85,9 +130,16 @@ const styles = StyleSheet.create({
     justifyContent: "flex-end",
     width: "100%",
   },
-  buttons: {
+  buttonsDetails: {
     flexDirection: "row",
     paddingBottom: 20,
     gap: 20,
+  },
+  button: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 4,
+    gap: 4,
   },
 });
