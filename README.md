@@ -1,15 +1,13 @@
 # Movie Inc
 
-Proyecto personal para una startup ficticia que necesita una APP que muestre las peliculas exhibiendose actualmente en los cines, consumiendo la API [The Movie Database (TMDB) API](https://developer.themoviedb.org/docs/getting-started).
+Proyecto personal de una app móvil diseñada para una startup ficticia. Permite a los usuarios explorar las películas actualmente en cartelera, consumiendo datos desde la API oficial de [The Movie Database (TMDB)](https://developer.themoviedb.org/docs/getting-started).
 
 El usuario puede:
 
-- Ver las distintas peliculas disponibles en los cines.
-- Ver detalles de la pelicula como reparto, genero, fecha de estreno, descripcion, etc.
-- Calificar una pelicula
-- Ver recomendaciones
-
-## Demo
+- Explorar las distintas películas disponibles en cines.
+- Ver detalles como reparto, género, fecha de estreno y descripción.
+- Calificar películas.
+- Ver recomendaciones de peliculas similares.
 
 ## Tecnologias usadas
 
@@ -22,11 +20,11 @@ El usuario puede:
 
 ## Estructura del proyecto
 
-- /api
-- /assets
-- /components
-- /constants
-- /context
-- /hooks
-- /navigation
-- /screens
+- `/api` – Llamadas y configuración de API.
+- `/assets` – Imágenes y recursos estáticos.
+- `/components` – Componentes reutilizables.
+- `/constants` – Constantes globales.
+- `/context` – Context API para estado global.
+- `/hooks` – Hooks personalizados.
+- `/navigation` – Configuración de navegación.
+- `/screens` – Vistas principales.

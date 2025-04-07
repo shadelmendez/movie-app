@@ -1,12 +1,11 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as SecureStore from "expo-secure-store";
 
 const TMDB_TOKEN_KEY = "tmdbToken";
 
 export async function getTmdbToken() {
-  try {
-    return await AsyncStorage.getItem(TMDB_TOKEN_KEY);
-  } catch (error) {
-    console.error("Error al obtener el token:", error);
-    return null;
-  }
+  return await SecureStore.getItemAsync(TMDB_TOKEN_KEY);
+}
+
+export async function deleteTmdbToken() {
+  await SecureStore.deleteItemAsync(TMDB_TOKEN_KEY);
 }
