@@ -1,4 +1,4 @@
-import React from "react";
+import { useContext } from "react";
 import {
   ImageBackground,
   View,
@@ -11,21 +11,36 @@ import useDeviceType from "../hooks/useDeciveType";
 import Colors from "../constants/colors";
 import Entypo from "@expo/vector-icons/Entypo";
 import { useNavigation } from "@react-navigation/native";
+import { MoviesContext } from "../context/GetMoviesContext";
 
-export default function MovieCard({ imageUrl }) {
+export default function MovieCard({ moviesData }) {
   const { width, height, isTablet } = useDeviceType();
   const navigation = useNavigation();
+  const { setdetailsMovie } = useContext(MoviesContext);
+
+  const handleSelectedMovie = () => {
+    setdetailsMovie(moviesData);
+    navigation.navigate("Details");
+  };
   return (
     <View
-      style={[styles.wrapper, { width: width * 0.3, height: height * 0.35 }]}
+      style={[
+        styles.wrapper,
+        { width: isTablet ? width * 0.3 : width * 0.43, height: height * 0.35 },
+      ]}
     >
       <ImageBackground
-        source={imageUrl}
+        source={{
+          uri: `https://image.tmdb.org/t/p/w780${moviesData.backdrop_path}`,
+        }}
         style={styles.image}
-        resizeMode="stretch"
       >
         <View style={styles.ratings}>
-          <AntDesign name="star" size={20} color={Colors.dark.accent} />
+          <AntDesign
+            name="star"
+            size={isTablet ? 20 : 12}
+            color={Colors.dark.accent}
+          />
           <Text
             style={{
               color: Colors.dark.accent,
@@ -33,15 +48,19 @@ export default function MovieCard({ imageUrl }) {
               fontSize: 10,
             }}
           >
-            8.0
+            {moviesData.vote_average.toFixed(1)}
           </Text>
         </View>
       </ImageBackground>
       <View style={styles.details}>
-        <Text style={{ fontFamily: "Poppins_700Bold", fontSize: 18 }}>
-          Coco
+        <Text
+          style={{
+            fontFamily: "Poppins_700Bold",
+            fontSize: isTablet ? 18 : 16,
+          }}
+        >
+          {moviesData.title}
         </Text>
-        <Text style={{ fontSize: 12 }}>Porducida por: Disney</Text>
         <View
           style={{
             alignItems: "center",
@@ -51,7 +70,7 @@ export default function MovieCard({ imageUrl }) {
         >
           <Entypo name="calendar" size={12} color={Colors.dark.highlight} />
           <Text style={{ fontFamily: "Poppins_700Bold", fontSize: 10 }}>
-            4/5/2025
+            {moviesData.release_date}
           </Text>
         </View>
       </View>
@@ -60,16 +79,16 @@ export default function MovieCard({ imageUrl }) {
           style={[
             styles.button,
             {
-              width: isTablet ? width * 0.12 : width * 0.05,
-              height: isTablet ? height * 0.03 : height * 0.05,
+              width: isTablet ? width * 0.12 : width * 0.15,
+              height: isTablet ? height * 0.03 : height * 0.04,
               backgroundColor: Colors.dark.highlight,
             },
           ]}
-          onPress={() => navigation.navigate("Details")}
+          onPress={handleSelectedMovie}
         >
           <Text
             style={{
-              fontSize: isTablet ? 10 : 8,
+              fontSize: 10,
               fontFamily: "Poppins_700Bold",
               color: "#fff",
             }}
@@ -81,17 +100,21 @@ export default function MovieCard({ imageUrl }) {
           style={[
             styles.button,
             {
-              width: isTablet ? width * 0.12 : width * 0.05,
-              height: isTablet ? height * 0.03 : height * 0.05,
+              width: isTablet ? width * 0.12 : width * 0.17,
+              height: isTablet ? height * 0.03 : height * 0.04,
               backgroundColor: "#F8F8FF",
             },
           ]}
-          onPress={() => navigation.navigate("Details")}
+          onPress={handleSelectedMovie}
         >
-          <AntDesign name="staro" size={18} color={Colors.dark.highlight} />
+          <AntDesign
+            name="staro"
+            size={isTablet ? 18 : 14}
+            color={Colors.dark.highlight}
+          />
           <Text
             style={{
-              fontSize: isTablet ? 10 : 8,
+              fontSize: 10,
               fontFamily: "Poppins_700Bold",
             }}
           >

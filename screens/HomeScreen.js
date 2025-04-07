@@ -5,42 +5,63 @@ import {
   SafeAreaView,
   ScrollView,
   ImageBackground,
-  Image,
 } from "react-native";
 import useDeviceType from "../hooks/useDeciveType";
 import CustomHeader from "../components/CustomHeader";
 import Carousel from "react-native-reanimated-carousel";
 import Colors from "../constants/colors";
 import NowPlaying from "../components/NowPlaying";
-const images = [
-  require("../assets/home.jpg"),
-  require("../assets/home.jpg"),
-  require("../assets/home.jpg"),
-  require("../assets/home.jpg"),
-  require("../assets/home.jpg"),
-];
+import { BlurView } from "expo-blur";
+import { LinearGradient } from "expo-linear-gradient";
+
+import { useGetMovies } from "../api/ConnectToTMDB";
 
 export default function HomeScreen() {
   const { isTablet, width, height } = useDeviceType();
+  const { data: movies = [] } = useGetMovies();
 
   return (
     <SafeAreaView style={styles.wrapper}>
       <CustomHeader />
-      <ScrollView contentContainerStyle={styles.scroll}>
+      <ScrollView
+        contentContainerStyle={[styles.scroll, { padding: isTablet ? 30 : 10 }]}
+      >
         <View style={[styles.hero, { height: height * 0.35 }]}>
           <Carousel
             width={width * 0.95}
             height={height * 0.35}
-            data={images}
+            data={movies}
             loop
             autoPlay={true}
             autoPlayInterval={5000}
             scrollAnimationDuration={1000}
-            renderItem={({ item }) => (
-              <View style={styles.imageWrapper}>
-                <Image source={item} style={styles.image} />
-              </View>
-            )}
+            renderItem={({ item }) => {
+              const imageUrl = item?.backdrop_path
+                ? `https://image.tmdb.org/t/p/w780${item.backdrop_path}`
+                : null;
+
+              return (
+                <View style={styles.imageWrapper}>
+                  {imageUrl ? (
+                    <ImageBackground
+                      source={{ uri: imageUrl }}
+                      style={styles.image}
+                      resizeMode="cover"
+                    >
+                      <BlurView
+                        intensity={50}
+                        tint="dark"
+                        style={styles.blurContainer}
+                      >
+                        <Text style={styles.title}>{item.title}</Text>
+                      </BlurView>
+                    </ImageBackground>
+                  ) : (
+                    <Text style={{ color: "#fff" }}>No image</Text>
+                  )}
+                </View>
+              );
+            }}
           />
         </View>
         <View>
@@ -61,7 +82,6 @@ const styles = StyleSheet.create({
   scroll: {
     flexGrow: 1,
     width: "100%",
-    padding: 30,
   },
 
   hero: {
@@ -88,6 +108,20 @@ const styles = StyleSheet.create({
   image: {
     width: "100%",
     height: "100%",
-    resizeMode: "cover",
+    alignItems: "flex-start",
+    justifyContent: "flex-end",
+  },
+
+  blurContainer: {
+    width: "100%",
+    padding: 12,
+    alignItems: "center",
+    borderBottomLeftRadius: 16,
+    borderBottomRightRadius: 16,
+  },
+  title: {
+    color: "#fff",
+    fontSize: 16,
+    fontFamily: "Poppins_700Bold",
   },
 });
