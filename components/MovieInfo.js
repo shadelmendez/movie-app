@@ -1,5 +1,4 @@
-import React from "react";
-import { View, Text, Image, StyleSheet, Pressable } from "react-native";
+import { View, Text, Image, StyleSheet, Pressable, Alert } from "react-native";
 import useDeviceType from "../hooks/useDeciveType";
 import { Rating } from "react-native-ratings";
 import ShowMovies from "./ShowMovies";
@@ -7,9 +6,25 @@ import Entypo from "@expo/vector-icons/Entypo";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import Colors from "../constants/colors";
 import Comments from "./Comments";
+import { useContext } from "react";
+import { MoviesContext } from "../context/GetMoviesContext";
+import GENRES from "../constants/genres";
+import { useGetCast, usePostRating } from "../api/ConnectToTMDB";
 
 export default function MovieInfo() {
   const { isTablet, width, height } = useDeviceType();
+  const { detailsMovie, setRating, rating } = useContext(MoviesContext);
+  const { data: cast = [] } = useGetCast(detailsMovie.id);
+  const starValue = (detailsMovie.vote_average / 10) * 5;
+  const { mutate: postRating } = usePostRating();
+
+  const handleRating = (value) => {
+    if (!value)
+      Alert.alert("Error", "Por favor coloque una calificación válida.", [
+        { text: "OK", style: "destructive" },
+      ]);
+    postRating({ movie_id: detailsMovie.id, value: value });
+  };
   return (
     <View style={[styles.wrapper, { padding: isTablet ? 22 : 18 }]}>
       <View>
@@ -21,7 +36,7 @@ export default function MovieInfo() {
             fontFamily: "Poppins_700Bold",
           }}
         >
-          Coco
+          {detailsMovie.title}
         </Text>
       </View>
       <View
@@ -37,7 +52,7 @@ export default function MovieInfo() {
             color: "#fff",
           }}
         >
-          Cine, Drama, Thriller
+          {detailsMovie.genre_ids.map((id) => GENRES[id]).join(", ")}
         </Text>
         <Entypo name="dot-single" size={24} color="#fff" />
         <Text
@@ -46,7 +61,8 @@ export default function MovieInfo() {
             color: "#fff",
           }}
         >
-          2025
+          {new Date(detailsMovie.release_date).getFullYear()}{" "}
+          {/*debe haber una mejor forma para manejar la fecha peroe sto servira atm */}
         </Text>
       </View>
       <View
@@ -57,11 +73,15 @@ export default function MovieInfo() {
         }}
       >
         <View style={styles.badge}>
-          <Text style={{ color: "#fff", fontSize: 12 }}>Genero</Text>
+          <Text style={{ color: "#fff", fontSize: 12 }}>
+            {detailsMovie.genre_ids.map((id) => GENRES[id])[0]}
+          </Text>
         </View>
         <View style={styles.badge}>
           <AntDesign name="star" size={20} color={Colors.dark.accent} />
-          <Text style={{ color: "#fff", fontSize: 12 }}>5.0</Text>
+          <Text style={{ color: "#fff", fontSize: 12 }}>
+            {detailsMovie.vote_average.toFixed(1)}
+          </Text>
         </View>
       </View>
       {/*actors */}
@@ -69,125 +89,70 @@ export default function MovieInfo() {
       <View
         style={{
           flexDirection: "row",
-          justifyContent: "space-around",
-          flex: 1,
+          flexWrap: "wrap",
+          justifyContent: "space-between",
           width: "100%",
           marginVertical: 14,
         }}
       >
-        <View>
-          <Image
-            source={require("../assets/actor.jpg")}
-            style={[
-              styles.actorsImg,
-              {
-                width: isTablet ? width * 0.2 : 0.1,
-                height: isTablet ? height * 0.1 : height * 0.05,
-              },
-            ]}
-          />
-          <Text
+        {cast?.slice(0, 4).map((c, index) => (
+          <View
+            key={index}
             style={{
-              textTransform: "capitalize",
-              color: Colors.dark.accent,
+              width: isTablet ? "22%" : "48%",
+              marginBottom: 16,
+              alignItems: "center",
             }}
           >
-            Kim taehyung,
-          </Text>
-          <Text style={{ textTransform: "capitalize", color: "#fff" }}>
-            King
-          </Text>
-        </View>
-
-        <View>
-          <Image
-            source={require("../assets/actor.jpg")}
-            style={[
-              styles.actorsImg,
-              {
-                width: isTablet ? width * 0.2 : 0.1,
-                height: isTablet ? height * 0.1 : height * 0.05,
-              },
-            ]}
-          />
-          <Text
-            style={{
-              textTransform: "capitalize",
-              color: Colors.dark.accent,
-            }}
-          >
-            Kim taehyung,
-          </Text>
-          <Text style={{ textTransform: "capitalize", color: "#fff" }}>
-            King
-          </Text>
-        </View>
-        <View>
-          <Image
-            source={require("../assets/actor.jpg")}
-            style={[
-              styles.actorsImg,
-              {
-                width: isTablet ? width * 0.2 : 0.1,
-                height: isTablet ? height * 0.1 : height * 0.05,
-              },
-            ]}
-          />
-          <Text
-            style={{
-              textTransform: "capitalize",
-              color: Colors.dark.accent,
-            }}
-          >
-            Kim taehyung,
-          </Text>
-          <Text style={{ textTransform: "capitalize", color: "#fff" }}>
-            King
-          </Text>
-        </View>
-        <View>
-          <Image
-            source={require("../assets/actor.jpg")}
-            style={[
-              styles.actorsImg,
-              {
-                width: isTablet ? width * 0.2 : 0.1,
-                height: isTablet ? height * 0.1 : height * 0.05,
-              },
-            ]}
-          />
-          <Text
-            style={{ textTransform: "capitalize", color: Colors.dark.accent }}
-          >
-            Kim taehyung,
-          </Text>
-          <Text style={{ textTransform: "capitalize", color: "#fff" }}>
-            King
-          </Text>
-        </View>
+            <Image
+              source={{
+                uri: `https://image.tmdb.org/t/p/w780${c.profile_path}`,
+              }}
+              style={[
+                styles.actorsImg,
+                {
+                  width: isTablet ? width * 0.2 : width * 0.4,
+                  height: isTablet ? height * 0.1 : height * 0.2,
+                },
+              ]}
+            />
+            <Text
+              style={{
+                textTransform: "capitalize",
+                color: Colors.dark.accent,
+                textAlign: "center",
+              }}
+            >
+              {c.name}
+            </Text>
+            <Text
+              style={{
+                textTransform: "capitalize",
+                color: "#fff",
+                textAlign: "center",
+              }}
+            >
+              {c.character}
+            </Text>
+          </View>
+        ))}
       </View>
-      {/*descripcion */}
+
+      {/*description */}
       <View style={{ marginVertical: 20 }}>
-        <Text style={{ color: "#fff" }}>
-          A React component for displaying different types of images, including
-          network images, static resources, temporary local images, and images
-          from local disk, such as the camera roll.
-        </Text>
+        <Text style={{ color: "#fff" }}>{detailsMovie.overview}</Text>
       </View>
       {/*rating */}
       <View
         style={{
-          // backgroundColor: "red",
           width: "100%",
           marginVertical: 20,
         }}
       >
+        {/*TODO: Seria bueno agregar la opcion de dejar un comentario */}
         <Text style={styles.titles}>Califique la película</Text>
         <View style={{ alignSelf: "flex-start", marginVertical: 20 }}>
           <View style={styles.commentsGrid}>
-            <Comments />
-            <Comments />
-            <Comments />
             <Comments />
           </View>
         </View>
@@ -204,26 +169,30 @@ export default function MovieInfo() {
           reviews={false}
           size={24}
           tintColor={Colors.dark.background}
-          //   onFinishRating={(value) => console.log("Rating is: " + value)}
+          startingValue={starValue}
+          onFinishRating={(value) => setRating(value)}
         />
         <Pressable
           style={[
             styles.button,
             {
-              width: isTablet ? width * 0.3 : width * 0.05,
+              width: isTablet ? width * 0.3 : width * 0.5,
               height: isTablet ? height * 0.05 : height * 0.05,
             },
           ]}
+          onPress={() => handleRating(rating)}
         >
-          <Text style={{ color: "#fff", fontSize: isTablet ? 18 : 12 }}>
+          <Text style={{ color: "#fff", fontSize: isTablet ? 18 : 16 }}>
             Calificar
           </Text>
         </Pressable>
       </View>
       {/*peliculas similares */}
       <View style={{ marginVertical: 20 }}>
-        <Text style={styles.titles}>Titulos Similares</Text>
-        <ShowMovies />
+        <Text style={[styles.titles, { marginVertical: 20 }]}>
+          Titulos Similares
+        </Text>
+        <ShowMovies isSimilarView={true} />
       </View>
     </View>
   );
@@ -243,6 +212,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 6,
     flexDirection: "row",
+    marginVertical: 10,
     gap: 4,
     borderRadius: 12,
   },
@@ -250,10 +220,6 @@ const styles = StyleSheet.create({
 
   commentsGrid: {
     flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "space-between",
-    rowGap: 12,
-    columnGap: 10,
   },
 
   button: {

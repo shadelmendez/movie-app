@@ -4,7 +4,7 @@ import Colors from "../constants/colors";
 import Ionicons from "@expo/vector-icons/Ionicons";
 
 export default function CustomHeader() {
-  const { height, width } = useDeviceType();
+  const { height, width, isTablet } = useDeviceType();
   const avatarUrl = "https://api.dicebear.com/7.x/bottts/png?seed=shadel";
   return (
     <View
@@ -13,8 +13,16 @@ export default function CustomHeader() {
         { height: height * 0.07, marginBottom: height * 0.02 },
       ]}
     >
-      <View style={[styles.user, { width: width * 0.3 }]}>
-        <Image source={{ uri: avatarUrl }} style={styles.avatar} />
+      <View
+        style={[styles.user, { width: isTablet ? width * 0.3 : width * 0.4 }]}
+      >
+        <Image
+          source={{ uri: avatarUrl }}
+          style={{
+            width: isTablet ? width * 0.07 : width * 0.1,
+            height: height * 0.05,
+          }}
+        />
         <View>
           <Text
             style={{
@@ -25,10 +33,10 @@ export default function CustomHeader() {
           >
             Hola de nuevo
           </Text>
+          {/*TODO: Implementar sesion de usuario, favoritos, etc (?) */}
           <Text
             style={{
               fontFamily: "Poppins_700Bold",
-
               color: Colors.dark.accent,
             }}
           >
@@ -59,10 +67,5 @@ const styles = StyleSheet.create({
   user: {
     flexDirection: "row",
     justifyContent: "space-around",
-  },
-  avatar: {
-    width: 50,
-    height: 50,
-    borderRadius: 16,
   },
 });
